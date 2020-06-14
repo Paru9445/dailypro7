@@ -5,6 +5,9 @@ var ObjectId = Schema.ObjectId;
 var UserSchema = new Schema({
   user_id        : { type: ObjectId },
   product_id     : { type: ObjectId },
+  name           : { type: String },
+  description    : { type: String },
+  image          : { type: String },
   size           : { type: String },
   price          : { type: String },
   creatd_at      : { type: Date, default : new Date() }

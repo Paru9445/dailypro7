@@ -37,16 +37,16 @@ router.post('/login', (req,res) => {
 	Users.find({email : email, password : password}, (err, data)=>{
 		
 		if(err){
-			res.json({error : false, message : "Something went wrong"})
+			res.json({error : true, message : "Something went wrong"})
 		}
 		else{
 			if(data.length == 1){
 				let mdata = data[0];
 
-				res.json({error : true, message : "Success", data : data[0]})
+				res.json({error : false, message : "Success", data : data[0]})
 			}
 			else{
-				res.json({error : false, message : "User not found", data : {}})
+				res.json({error : true, message : "User not found", data : {}})
 			}
 			
 		}
@@ -140,7 +140,7 @@ router.post('/listItems', (req, res)=>{
       res.json({error : true, message : "Something went wrong"});
     }
     else{
-      res.json({error : false, message : "Done", data : data});
+      res.json({error : false, message : "Success", data : data});
     }
   })
 })
@@ -151,22 +151,22 @@ router.post('/addToBook', (req, res)=>{
   size = req.body.size;
   price = req.body.price;
 
-  Booked.find({user_id : user_id, product_id : product_id}, (err, data)=>{
+  Item.find({_id : product_id}, function(err, data){
     if(err){
       res.json({error : true, message : "Something went wrong"});
     }
     else{
-      if(data.length != 0){
-        res.json({error : false, message : "Already added"});
-      }
-      else{
+      if(data.length > 0){
         book = new Booked({
           user_id : user_id,
           product_id : product_id,
+          name : data[0].name,
+          description : data[0].description,
+          image : data[0].image,
           size : size,
           price : price,
         })
-
+      
         book.save((err) => {
           if(!err){
             res.json({error : false, message : "Saved"})
@@ -177,7 +177,7 @@ router.post('/addToBook', (req, res)=>{
         })
       }
     }
-  })
+  })      
 })
 
 router.post('/myList', (req,res) => {
