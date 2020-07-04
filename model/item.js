@@ -5,6 +5,8 @@ var UserSchema = new Schema({
   name            : { type: String },
   description     : { type: String },
   image           : { type: String },
+  price           : { type: String },
+  size            : { type: String },
   creatd_at       : { type: Date, default : new Date() }
 });
 
