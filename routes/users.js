@@ -102,26 +102,32 @@ router.post('/register', (req, res)=>{
 })
 
 router.post('/addItem', upload.single('image'), (req, res)=>{
-	image = req.body.name;
 	name = req.body.name;
-	description = req.body.description;
-	price = req.body.password;
-  size = req.body.size;
-
+  category = req.body.category;
+  price = req.body.price;
+  description = req.body.description;
+  top_speed = req.body.top_speed;
+  power = req.body.power;
+  range = req.body.range;
+  weight = req.body.weight;
 
   if(req.file){
-    imegname = req.file.filename
+    imagename = req.file.filename
   }
   else{
-    imegname = "";
+    imagename = "";
   }
 		
   item = new Item({
     name : name,
-    description : description,
+    category : category,
     price : price,
-    size: size,
-    image : imegname,
+    description : description,
+    top_speed : top_speed,
+    power : power,
+    range : range,
+    weight : weight,
+    image : imagename
   })
   
   item.save((err,data) => {
@@ -148,36 +154,21 @@ router.post('/listItems', (req, res)=>{
 router.post('/addToBook', (req, res)=>{
   user_id = ObjectId(req.body.user_id);
   product_id = ObjectId(req.body.product_id);
-  size = req.body.size;
-  price = req.body.price;
 
-  Item.find({_id : product_id}, function(err, data){
-    if(err){
-      res.json({error : true, message : "Something went wrong"});
+  book = new Booked({
+    user_id : user_id,
+    product_id : product_id,
+  })
+
+  book.save((err) => {
+    if(!err){
+      res.json({error : false, message : "Saved"})
     }
     else{
-      if(data.length > 0){
-        book = new Booked({
-          user_id : user_id,
-          product_id : product_id,
-          name : data[0].name,
-          description : data[0].description,
-          image : data[0].image,
-          size : size,
-          price : price,
-        })
-      
-        book.save((err) => {
-          if(!err){
-            res.json({error : false, message : "Saved"})
-          }
-          else{
-            res.json({error : true, message : "Failed to save"})
-          }
-        })
-      }
+      res.json({error : true, message : "Failed to save"})
     }
-  })      
+  })
+
 })
 
 router.post('/myList', (req,res) => {
@@ -185,7 +176,16 @@ router.post('/myList', (req,res) => {
 
   console.log("user_id ", user_id);
 
-  Booked.find({user_id : user_id}, function(err, data){
+  Booked.aggregate([
+    {$match : {user_id : user_id}},
+    {$lookup : {
+      from: "items",
+       localField: "product_id",
+       foreignField: "_id",
+       as: "product_data"
+    }}
+  ], 
+  function(err, data){
     if(err){
       res.json({error : true, message : "Something went wrong"});
     }
