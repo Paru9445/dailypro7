@@ -102,14 +102,15 @@ router.post('/register', (req, res)=>{
 })
 
 router.post('/addItem', upload.single('image'), (req, res)=>{
-	name = req.body.name;
-  category = req.body.category;
-  price = req.body.price;
-  description = req.body.description;
-  top_speed = req.body.top_speed;
-  power = req.body.power;
-  range = req.body.range;
-  weight = req.body.weight;
+  name = req.body.name
+  price = req.body.price
+  description = req.body.description
+  type = req.body.type
+  primary = req.body.primary
+  material = req.body.material
+  length = req.body.length
+  breadth = req.body.breadth
+  height = req.body.height
 
   if(req.file){
     imagename = req.file.filename
@@ -120,13 +121,14 @@ router.post('/addItem', upload.single('image'), (req, res)=>{
 		
   item = new Item({
     name : name,
-    category : category,
     price : price,
     description : description,
-    top_speed : top_speed,
-    power : power,
-    range : range,
-    weight : weight,
+    type : type,
+    primary : primary,
+    material : material,
+    length : length,
+    breadth : breadth,
+    height   : height,
     image : imagename
   })
   
@@ -173,9 +175,7 @@ router.post('/addToBook', (req, res)=>{
 
 router.post('/myList', (req,res) => {
   user_id = ObjectId(req.body.id);
-
-  console.log("user_id ", user_id);
-
+  
   Booked.aggregate([
     {$match : {user_id : user_id}},
     {$lookup : {
